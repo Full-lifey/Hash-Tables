@@ -1,21 +1,24 @@
 # '''
 # Linked List hash table key/value pair
 # '''
+
+
 class LinkedPair:
     def __init__(self, key, value):
         self.key = key
         self.value = value
         self.next = None
 
+
 class HashTable:
     '''
     A hash table that with `capacity` buckets
     that accepts string keys
     '''
+
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
-
 
     def _hash(self, key):
         '''
@@ -25,7 +28,6 @@ class HashTable:
         '''
         return hash(key)
 
-
     def _hash_djb2(self, key):
         '''
         Hash an arbitrary key using DJB2 hash
@@ -34,14 +36,12 @@ class HashTable:
         '''
         pass
 
-
     def _hash_mod(self, key):
         '''
         Take an arbitrary key and return a valid integer index
         within the storage capacity of the hash table.
         '''
         return self._hash(key) % self.capacity
-
 
     def insert(self, key, value):
         '''
@@ -51,9 +51,21 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
-
+        index = self._hash_mod(key)
+        current_pair = self.storage[index]
+        if current_pair:
+            if key == current_pair.key:
+                current_pair.value = value
+            else:
+                if current_pair.next:
+                    while current_pair.next:
+                        current_pair == current_pair.next
+                    else:
+                        current_pair.next = LinkedPair(key, value)
+                else:
+                    current_pair.next = LinkedPair(key, value)
+        else:
+            self.storage[index] = LinkedPair(key, value)
 
     def remove(self, key):
         '''
@@ -63,8 +75,28 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash_mod(key)
+        current_pair = self.storage[index]
+        if current_pair:
+            if key == current_pair.key:
+                print(current_pair.value)
+                if current_pair.next:
+                    self.storage[index] = current_pair.next
+            elif current_pair.next:
+                value = None
+                while current_pair.next:
+                    next = current_pair.next
+                    if key == next.key:
+                        value = next.value
+                        current_pair.next = next.next
+                    current_pair = current_pair.next
+                else:
+                    if value == None:
+                        print("warning, key given is not in HashTable")
+            else:
+                print("warning, key given is not in HashTable")
+        else:
+            print("warning, key given is not in HashTable")
 
     def retrieve(self, key):
         '''
@@ -74,8 +106,21 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        index = self._hash_mod(key)
+        current_pair = self.storage[index]
+        if current_pair:
+            if key == current_pair.key:
+                return current_pair.value
+            elif current_pair.next:
+                value = None
+                while current_pair.next:
+                    if key == current_pair.next.key:
+                        value = current_pair.next.value
+                    current_pair = current_pair.next
+                else:
+                    return value
+        else:
+            return None
 
     def resize(self):
         '''
@@ -84,8 +129,23 @@ class HashTable:
 
         Fill this in.
         '''
-        pass
-
+        # Double self.capacity
+        self.capacity = self.capacity * 2
+        # creates new storage of twice the size
+        new_storage = [None] * self.capacity
+        old_storage = self.storage
+        self.storage = new_storage
+        for i in range(len(old_storage)):
+            if old_storage[i] != None:
+                if old_storage[i].next:
+                    current = old_storage[i]
+                    while current.next:
+                        self.insert(current.key, current.value)
+                        current = current.next
+                    else:
+                        self.insert(current.key, current.value)
+                else:
+                    self.insert(old_storage[i].key, old_storage[i].value)
 
 
 if __name__ == "__main__":
