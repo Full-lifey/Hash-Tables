@@ -4,10 +4,10 @@
 
 
 class LinkedPair:
-    def __init__(self, key, value):
+    def __init__(self, key, value, next_pair=None):
         self.key = key
         self.value = value
-        self.next = None
+        self.next = next_pair
 
 
 class HashTable:
@@ -19,6 +19,7 @@ class HashTable:
     def __init__(self, capacity):
         self.capacity = capacity  # Number of buckets in the hash table
         self.storage = [None] * capacity
+        # self.counter = 0
 
     def _hash(self, key):
         '''
@@ -51,19 +52,31 @@ class HashTable:
 
         Fill this in.
         '''
+        # self.counter += 1
+        # if self.counter / self.capacity >= 0.7:
+        #     self.resize()
+        # print('self.counter', self.counter)
+        # print('self.capacity', self.capacity)
         index = self._hash_mod(key)
         current_pair = self.storage[index]
         if current_pair:
             if key == current_pair.key:
                 current_pair.value = value
+                return
             else:
-                if current_pair.next:
-                    while current_pair.next:
-                        current_pair == current_pair.next
-                    else:
-                        current_pair.next = LinkedPair(key, value)
-                else:
-                    current_pair.next = LinkedPair(key, value)
+                # Insert at head instead of tail
+                # Create LinkedPair and set next to current_pair
+                new_pair = LinkedPair(key, value, current_pair)
+                # Set new_pair to hash table index
+                self.storage[index] = new_pair
+                # if current_pair.next:
+                #     while current_pair.next:
+                #         current_pair == current_pair.next
+                #     else:
+                #         current_pair.next = LinkedPair(key, value)
+                #         # return
+                # else:
+                #     current_pair.next = LinkedPair(key, value)
         else:
             self.storage[index] = LinkedPair(key, value)
 
@@ -79,22 +92,28 @@ class HashTable:
         current_pair = self.storage[index]
         if current_pair:
             if key == current_pair.key:
-                print(current_pair.value)
+                # self.counter -= 1
                 if current_pair.next:
                     self.storage[index] = current_pair.next
+                else:
+                    self.storage[index] = None
+                return
             elif current_pair.next:
                 value = None
                 while current_pair.next:
                     next = current_pair.next
                     if key == next.key:
+                        # self.counter -= 1
                         value = next.value
                         current_pair.next = next.next
+                        # return
                     current_pair = current_pair.next
                 else:
-                    if value == None:
-                        print("warning, key given is not in HashTable")
+                    print("warning, key given is not in HashTable")
+                    # return
             else:
                 print("warning, key given is not in HashTable")
+                # return
         else:
             print("warning, key given is not in HashTable")
 
@@ -112,13 +131,14 @@ class HashTable:
             if key == current_pair.key:
                 return current_pair.value
             elif current_pair.next:
-                value = None
                 while current_pair.next:
-                    if key == current_pair.next.key:
-                        value = current_pair.next.value
                     current_pair = current_pair.next
+                    if key == current_pair.key:
+                        return current_pair.value
                 else:
-                    return value
+                    return None
+            else:
+                return None
         else:
             return None
 
@@ -129,11 +149,16 @@ class HashTable:
 
         Fill this in.
         '''
+        print('called resize')
+        # Save current counter value
+        # self.counter = 0
         # Double self.capacity
         self.capacity = self.capacity * 2
         # creates new storage of twice the size
         new_storage = [None] * self.capacity
+        # copies self.storage to old storage
         old_storage = self.storage
+        # sets self.storage to new, empty storage with 2x size
         self.storage = new_storage
         for i in range(len(old_storage)):
             if old_storage[i] != None:
